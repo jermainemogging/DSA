@@ -1,0 +1,341 @@
+#include <iostream>
+#include <vector>
+#include <fstream>
+#include <string>
+#include <cstdlib>
+
+using namespace std;
+
+// ---------------- STRUCT ----------------
+struct Task {
+    string title;
+    string description;
+    string deadline;
+    string priority;
+    string status;
+};
+
+// ---------------- VECTOR ----------------
+vector<Task> tasks;
+
+// ---------------- PRIORITY VALUE ----------------
+int getPriorityValue(string priority) {
+
+    if (priority == "High")
+        return 3;
+
+    else if (priority == "Medium")
+        return 2;
+
+    else
+        return 1;
+}
+
+// ---------------- SORT TASKS ----------------
+// Bubble Sort Algorithm
+void sortTasks() {
+
+    for (int i = 0; i < tasks.size() - 1; i++) {
+
+        for (int j = 0; j < tasks.size() - i - 1; j++) {
+
+            if (getPriorityValue(tasks[j].priority) <
+                getPriorityValue(tasks[j + 1].priority)) {
+
+                swap(tasks[j], tasks[j + 1]);
+            }
+        }
+    }
+}
+
+// ---------------- ADD TASK ----------------
+void addTask() {
+
+    Task t;
+
+    cout << "\n===== ADD TASK =====\n";
+
+    cout << "Enter Title: ";
+    getline(cin, t.title);
+
+    cout << "Enter Description: ";
+    getline(cin, t.description);
+
+    cout << "Enter Deadline (YYYY-MM-DD): ";
+    getline(cin, t.deadline);
+
+    cout << "Enter Priority (High/Medium/Low): ";
+    getline(cin, t.priority);
+
+    t.status = "Pending";
+
+    tasks.push_back(t);
+
+    sortTasks();
+
+    cout << "Task added successfully!\n";
+}
+
+// ---------------- VIEW TASKS ----------------
+void viewTasks() {
+
+    if (tasks.empty()) {
+
+        cout << "\nNo tasks available.\n";
+        return;
+    }
+
+    cout << "\n===== TASK LIST =====\n";
+
+    for (int i = 0; i < tasks.size(); i++) {
+
+        cout << i + 1 << ". "
+            << tasks[i].title
+            << " | " << tasks[i].priority
+            << " | " << tasks[i].status
+            << " | Deadline: " << tasks[i].deadline
+            << endl;
+    }
+}
+
+// ---------------- SEARCH TASK ----------------
+void searchTask() {
+
+    string keyword;
+    bool found = false;
+
+    cout << "\nEnter title keyword to search: ";
+    getline(cin, keyword);
+
+    cout << "\n===== SEARCH RESULTS =====\n";
+
+    for (int i = 0; i < tasks.size(); i++) {
+
+        if (tasks[i].title.find(keyword) != string::npos) {
+
+            cout << i + 1 << ". "
+                << tasks[i].title
+                << " | " << tasks[i].priority
+                << " | " << tasks[i].status
+                << endl;
+
+            found = true;
+        }
+    }
+
+    if (!found) {
+        cout << "No matching task found.\n";
+    }
+}
+
+// ---------------- MARK DONE ----------------
+void markDone() {
+
+    if (tasks.empty()) {
+
+        cout << "\nNo tasks available.\n";
+        return;
+    }
+
+    int index;
+
+    viewTasks();
+
+    cout << "\nEnter task number to mark as completed: ";
+    cin >> index;
+    cin.ignore();
+
+    if (index > 0 && index <= tasks.size()) {
+
+        tasks[index - 1].status = "Completed";
+
+        cout << "Task marked as completed!\n";
+    }
+    else {
+
+        cout << "Invalid task number.\n";
+    }
+}
+
+// ---------------- DELETE TASK ----------------
+void deleteTask() {
+
+    if (tasks.empty()) {
+
+        cout << "\nNo tasks available.\n";
+        return;
+    }
+
+    int index;
+
+    viewTasks();
+
+    cout << "\nEnter task number to delete: ";
+    cin >> index;
+    cin.ignore();
+
+    if (index > 0 && index <= tasks.size()) {
+
+        tasks.erase(tasks.begin() + (index - 1));
+
+        cout << "Task deleted successfully!\n";
+    }
+    else {
+
+        cout << "Invalid task number.\n";
+    }
+}
+
+// ---------------- TASK STATISTICS ----------------
+void showStatistics() {
+
+    int completed = 0;
+
+    for (int i = 0; i < tasks.size(); i++) {
+
+        if (tasks[i].status == "Completed") {
+            completed++;
+        }
+    }
+
+    cout << "\n===== TASK STATISTICS =====\n";
+
+    cout << "Total Tasks: " << tasks.size() << endl;
+    cout << "Completed Tasks: " << completed << endl;
+    cout << "Pending Tasks: " << tasks.size() - completed << endl;
+
+    if (!tasks.empty()) {
+
+        double percentage =
+            ((double)completed / tasks.size()) * 100;
+
+        cout << "Completion Rate: "
+            << percentage
+            << "%\n";
+    }
+}
+
+// ---------------- SAVE TASKS ----------------
+void saveTasks() {
+
+    ofstream file("tasks.txt");
+
+    if (!file) {
+
+        cout << "Error saving file.\n";
+        return;
+    }
+
+    for (Task t : tasks) {
+
+        file << t.title << "|"
+            << t.description << "|"
+            << t.deadline << "|"
+            << t.priority << "|"
+            << t.status << endl;
+    }
+
+    file.close();
+
+    cout << "Tasks saved successfully!\n";
+}
+
+// ---------------- LOAD TASKS ----------------
+void loadTasks() {
+
+    ifstream file("tasks.txt");
+
+    if (!file) {
+        return;
+    }
+
+    Task t;
+
+    while (
+        getline(file, t.title, '|') &&
+        getline(file, t.description, '|') &&
+        getline(file, t.deadline, '|') &&
+        getline(file, t.priority, '|') &&
+        getline(file, t.status)
+        ) {
+
+        tasks.push_back(t);
+    }
+
+    file.close();
+
+    sortTasks();
+}
+
+// ---------------- MAIN FUNCTION ----------------
+int main() {
+
+    loadTasks();
+
+    int choice;
+
+    do {
+
+        system("cls");
+
+        cout << "\n===== SMART STUDY PLANNER =====\n";
+
+        cout << "1. Add Task\n";
+        cout << "2. View Tasks\n";
+        cout << "3. Search Task\n";
+        cout << "4. Mark Completed\n";
+        cout << "5. Delete Task\n";
+        cout << "6. Show Statistics\n";
+        cout << "7. Save Tasks\n";
+        cout << "0. Exit\n";
+
+        cout << "Enter Choice: ";
+        cin >> choice;
+        cin.ignore();
+
+        switch (choice) {
+
+        case 1:
+            addTask();
+            break;
+
+        case 2:
+            viewTasks();
+            system("pause");
+            break;
+
+        case 3:
+            searchTask();
+            system("pause");
+            break;
+
+        case 4:
+            markDone();
+            break;
+
+        case 5:
+            deleteTask();
+            break;
+
+        case 6:
+            showStatistics();
+            system("pause");
+            break;
+
+        case 7:
+            saveTasks();
+            system("pause");
+            break;
+
+        case 0:
+            cout << "Exiting program...\n";
+            break;
+
+        default:
+            cout << "Invalid choice.\n";
+        }
+
+    } while (choice != 0);
+
+    return 0;
+}
