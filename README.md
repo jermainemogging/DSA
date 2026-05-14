@@ -1,9 +1,3 @@
-DESCRIPTION
-
-The Smart Study Planner System is a C++ console-based application designed to help students organize and manage their academic tasks efficiently. The system allows users to add, view, search, update, and delete study tasks while storing important information such as title, description, deadline, priority level, and task status. It uses data structures such as structs and vectors, along with sorting and searching algorithms, to organize tasks based on priority and improve task management. The program also implements file handling to save and load task records, ensuring persistent data storage even after the application is closed.
-
-
-
 SMART STUDY PLANNER SYSTEM
 Created By: Jermaine Encinares, CS-1203
 Final Project for the Course CC 102 | Advanced Computer Programming
